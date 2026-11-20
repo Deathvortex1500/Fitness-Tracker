@@ -1,0 +1,10 @@
+*.o
+*.user
+FitnessTracker
+Fitness
+Makefile
+.qmake.stash
+build-appimage/
+AppDir/
+dist/
+tools/*.AppImage

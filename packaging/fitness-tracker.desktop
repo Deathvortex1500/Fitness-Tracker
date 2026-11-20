@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Type=Application
+Name=Fitness
+Comment=Private nutrition and workout tracking
+Exec=Fitness
+Icon=fitness-tracker
+Categories=Utility;Sports;
+Terminal=false
