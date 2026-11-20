@@ -206,6 +206,33 @@ void DataStore::consumeRecipe(int recipeId, const QDate &date, double servings) 
              QString("%1 × %2 serving(s)").arg(q.value("name").toString()).arg(servings));
 }
 
+bool DataStore::deleteRecipe(int recipeId) {
+    if (!db.transaction()) return false;
+    QSqlQuery q(db); q.prepare("DELETE FROM recipe_ingredients WHERE recipe_id=?"); q.addBindValue(recipeId);
+    if (!q.exec()) { db.rollback(); error=q.lastError().text(); return false; }
+    q.prepare("DELETE FROM recipes WHERE id=?"); q.addBindValue(recipeId);
+    if (!q.exec()) { db.rollback(); error=q.lastError().text(); return false; }
+    return db.commit();
+}
+
+bool DataStore::deleteAllRecipes() {
+    if (!db.transaction()) return false; QSqlQuery q(db);
+    for (const QString &table : {"recipe_ingredients","recipes"})
+        if (!q.exec("DELETE FROM "+table)) { db.rollback(); error=q.lastError().text(); return false; }
+    return db.commit();
+}
+
+bool DataStore::deleteAllIngredients() {
+    QSqlQuery q(db); if (!q.exec("DELETE FROM pantry")) { error=q.lastError().text(); return false; } return true;
+}
+
+bool DataStore::deleteAllStats() {
+    if (!db.transaction()) return false; QSqlQuery q(db);
+    for (const QString &table : {"daily","workouts"})
+        if (!q.exec("DELETE FROM "+table)) { db.rollback(); error=q.lastError().text(); return false; }
+    return db.commit();
+}
+
 bool DataStore::resetAllData() {
     if (!db.transaction()) return false;
     QSqlQuery q(db);

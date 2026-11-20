@@ -41,6 +41,10 @@ public:
     QVector<QVariantMap> recipes() const;
     QVector<QVariantMap> recipeIngredients(int recipeId) const;
     void consumeRecipe(int recipeId, const QDate &date, double servings);
+    bool deleteRecipe(int recipeId);
+    bool deleteAllRecipes();
+    bool deleteAllIngredients();
+    bool deleteAllStats();
     bool resetAllData();
 
     QVector<QVariantMap> dailyRange(const QDate &from, const QDate &to) const;

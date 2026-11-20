@@ -39,9 +39,9 @@ private:
     QDate activeDashboardDate{QDate::currentDate()}, activeLogDate{QDate::currentDate()};
     QWidget *dashboard{};
     QLabel *dashboardDate{}, *logDateLabel{}, *profileHeading{}, *weightValue{}, *calorieValue{};
-    QLabel *proteinValue{}, *carbValue{}, *fatValue{}, *waterValue{};
+    QLabel *proteinValue{}, *carbValue{}, *fatValue{}, *waterValue{}, *totalValue{};
     QLabel *logCalorieUnit{}, *logProteinUnit{}, *logCarbUnit{}, *logFatUnit{}, *logWaterUnit{}, *logWeightUnit{};
-    QProgressBar *calorieBar{}, *proteinBar{}, *carbBar{}, *fatBar{}, *waterBar{};
+    QProgressBar *calorieBar{}, *proteinBar{}, *carbBar{}, *fatBar{}, *waterBar{}, *totalBar{};
 
     QDoubleSpinBox *logCalories{}, *logProtein{}, *logCarbs{}, *logFat{}, *logWater{}, *logWeight{};
     QComboBox *logRecipeChoice{};
