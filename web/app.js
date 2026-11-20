@@ -1,4 +1,4 @@
-const VERSION='0.87';
+const VERSION='0.88';
 const navIcons={
   overview:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10M9 20v-6h6v6"/></svg>',
   log:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>',
@@ -47,7 +47,7 @@ function convertTo(v,unit){if(unit==='kJ')return v*4.184;if(unit==='lb')return v
 function bindCommon(){
   document.querySelectorAll('[data-date]').forEach(button=>button.onclick=async()=>{state[button.dataset.date]=shiftDate(state[button.dataset.date],Number(button.dataset.step));await render()});
 }
-function closeMenu(){document.querySelector('#mobile-menu').removeAttribute('open')}
+function closeMenu(){mobileMenu.classList.remove('open');mobileNav.hidden=true;menuButton.setAttribute('aria-expanded','false')}
 function setupNav(){document.documentElement.style.setProperty('--accent',pageColors[state.page]);document.body.dataset.page=state.page;const links=pages.map(([id,label])=>`<button class="nav-button ${state.page===id?'active':''}" data-page="${id}" style="--nav-color:${pageColors[id]}"><span class="nav-icon">${navIcons[id]}</span><span class="nav-label">${label}</span></button>`).join('');document.querySelector('#nav').innerHTML=links;document.querySelector('#mobile-nav').innerHTML=links;document.querySelectorAll('[data-page]').forEach(b=>b.onclick=async()=>{const next=b.dataset.page;closeMenu();if(state.page!==next){state.page=next;history.pushState(null,'',`#${next}`)}await render()})}
 
 async function profile(){return db.get('profile','main')}
@@ -84,9 +84,8 @@ async function resetData(){if(!confirm('Permanently erase all fitness data on th
 async function showSetup(){const settings=await db.get('settings','main');modalContent.innerHTML=`<h2>Welcome to Fitness</h2><p>Complete setup to calculate your daily goals.</p><form id="setup-form" class="form-grid">${field('Name','setup-name','text','required')}${field('Date of birth','setup-birth','date','required')}${profileMeasureFields('setup')}${field('Workouts / week','setup-workouts','number','min="0" max="14" value="3"')}${field('Labor-intensive days / 2 weeks','setup-labor','number','min="0" max="14" value="0"')}<h3 class="form-section-title">Display units</h3>${unitFields('setup',settings.units)}<div class="dialog-actions field full"><button class="primary">Start tracking</button></div></form>`;modal.showModal();bindMeasureFields('setup');document.querySelector('#setup-form').onsubmit=async e=>{e.preventDefault();const measures=readProfileMeasures('setup'),selectedUnits={};document.querySelectorAll('[data-setup-unit]').forEach(select=>selectedUnits[select.dataset.setupUnit]=select.value);await db.put('settings',{key:'main',units:selectedUnits});await db.put('profile',{key:'main',name:document.querySelector('#setup-name').value.trim(),birthDate:document.querySelector('#setup-birth').value,...measures,workouts:Number(document.querySelector('#setup-workouts').value),labor:Number(document.querySelector('#setup-labor').value)});modal.close();render()}}
 
 async function render(){setupNav();const renderers={overview:renderOverview,log:renderLog,workouts:renderWorkouts,pantry:renderPantry,recipes:renderRecipes,analytics:renderAnalytics,settings:renderSettings};await renderers[state.page]()}
-const mobileMenu=document.querySelector('#mobile-menu'),menuButton=document.querySelector('#menu-button');menuButton.onclick=e=>{if(mobileMenu.open){e.preventDefault();closeMenu()}};document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
+const mobileMenu=document.querySelector('#mobile-menu'),mobileNav=document.querySelector('#mobile-nav'),menuButton=document.querySelector('#menu-button');menuButton.onclick=()=>{const open=!mobileMenu.classList.contains('open');mobileMenu.classList.toggle('open',open);mobileNav.hidden=!open;menuButton.setAttribute('aria-expanded',String(open))};document.addEventListener('click',e=>{if(mobileMenu.classList.contains('open')&&!mobileMenu.contains(e.target))closeMenu()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
 const hash=location.hash.slice(1);if(pages.some(p=>p[0]===hash))state.page=hash;
-window.addEventListener('hashchange',()=>{const p=location.hash.slice(1);if(pages.some(x=>x[0]===p)){state.page=p;render()}});
 window.addEventListener('popstate',()=>{const p=location.hash.slice(1)||'overview';if(pages.some(x=>x[0]===p)){state.page=p;render()}});
 await render();if(!await profile())showSetup();
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));

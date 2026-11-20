@@ -72,7 +72,7 @@ QString metricLabel(const QString &metric) {
 }
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
-    setWindowTitle("Fitness · v0.87"); resize(1280, 820); setMinimumSize(320,480);
+    setWindowTitle("Fitness · v0.88"); resize(1280, 820); setMinimumSize(320,480);
     qApp->setStyleSheet(R"(
         *{font-family:Inter,Segoe UI,Sans;font-size:14px} QMainWindow,QWidget{background:#0d1117;color:#d8dee9} QLabel{padding:4px 6px} QCheckBox,QRadioButton{padding:5px}
         #nav{background:#090d12;border-right:1px solid #252b33} #navButton{text-align:left;padding:0 18px;background:transparent;border:0;color:#8b949e;border-radius:8px}
@@ -84,7 +84,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     )");
     auto *root = new QWidget; auto *outer = new QHBoxLayout(root); outer->setContentsMargins(0,0,0,0); outer->setSpacing(0);
     navigation = new QFrame; navigation->setObjectName("nav"); navigation->setFixedWidth(210); auto *navLayout = new QVBoxLayout(navigation);
-    navigationBrand = new QLabel("FITNESS<br><span style='font-size:10px;color:#668f8a'>v0.87</span>"); navigationBrand->setTextFormat(Qt::RichText); navigationBrand->setStyleSheet("font-size:19px;font-weight:900;color:#4d9b92;padding:18px 10px;letter-spacing:1px"); navLayout->addWidget(navigationBrand);
+    navigationBrand = new QLabel("FITNESS<br><span style='font-size:10px;color:#668f8a'>v0.88</span>"); navigationBrand->setTextFormat(Qt::RichText); navigationBrand->setStyleSheet("font-size:19px;font-weight:900;color:#4d9b92;padding:18px 10px;letter-spacing:1px"); navLayout->addWidget(navigationBrand);
     pages = new QStackedWidget;
     navigationNames={"Overview","Log","Workouts","Pantry","Recipes","Analytics","Settings"};
     navigationIcons={"⌂","＋","◆","▦","▤","↗","⚙"};
