@@ -1,4 +1,4 @@
-# Fitness PWA v0.85
+# Fitness PWA v0.86
 
 This is the separate, mobile-first web edition of Fitness Tracker. It stores all
 profile, nutrition, workout, pantry, recipe, photo, and settings data locally in
