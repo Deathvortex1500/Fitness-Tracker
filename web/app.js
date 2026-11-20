@@ -1,4 +1,4 @@
-const VERSION='0.84';
+const VERSION='0.85';
 const navIcons={
   overview:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10M9 20v-6h6v6"/></svg>',
   log:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>',
@@ -47,7 +47,7 @@ function bindCommon(){
   document.querySelectorAll('[data-date]').forEach(button=>button.onclick=async()=>{state[button.dataset.date]=shiftDate(state[button.dataset.date],Number(button.dataset.step));await render()});
 }
 function closeMenu(){document.body.classList.remove('menu-open');document.querySelector('#menu-button').setAttribute('aria-expanded','false')}
-function setupNav(){document.documentElement.style.setProperty("--accent",pageColors[state.page]);document.body.dataset.page=state.page;document.querySelector('#nav').innerHTML=pages.map(([id,label])=>`<button class="nav-button ${state.page===id?'active':''}" data-page="${id}" style="--nav-color:${pageColors[id]}"><span class="nav-icon">${navIcons[id]}</span><span class="nav-label">${label}</span></button>`).join('');document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{state.page=b.dataset.page;location.hash=state.page;closeMenu();render()})}
+function setupNav(){document.documentElement.style.setProperty("--accent",pageColors[state.page]);document.querySelector('#nav').innerHTML=pages.map(([id,label])=>`<button class="nav-button ${state.page===id?'active':''}" data-page="${id}" style="--nav-color:${pageColors[id]}"><span class="nav-icon">${navIcons[id]}</span><span class="nav-label">${label}</span></button>`).join('');document.querySelectorAll('#nav [data-page]').forEach(button=>button.onclick=()=>{const next=button.dataset.page;closeMenu();if(location.hash.slice(1)!==next)location.hash=next})}
 
 async function profile(){return db.get('profile','main')}
 function goals(p){if(!p)return{calories:2200,protein:126,carbs:250,fat:70,water:2.5};const age=Math.floor((Date.now()-new Date(p.birthDate))/31557600000),activity=p.workouts+p.labor/2,factor=activity<1?1.2:activity<3?1.375:activity<5?1.55:activity<7?1.725:1.9,calories=Math.max(1200,10*p.weightKg+6.25*p.heightCm-5*age-78)*factor;return{calories:Math.round(calories),protein:Math.round(p.weightKg*1.6),carbs:Math.round(calories*.46/4),fat:Math.round(calories*.27/9),water:Math.max(2,p.weightKg*.033)}}
@@ -82,7 +82,7 @@ async function resetData(){if(!confirm('Permanently erase all fitness data on th
 
 async function showSetup(){modalContent.innerHTML=`<h2>Welcome to Fitness</h2><p>Complete setup to calculate your daily goals.</p><form id="setup-form" class="form-grid">${field('Name','setup-name','text','required')}${field('Date of birth','setup-birth','date','required')}${profileMeasureFields('setup')}${field('Workouts / week','setup-workouts','number','min="0" max="14" value="3"')}${field('Labor-intensive days / 2 weeks','setup-labor','number','min="0" max="14" value="0"')}<div class="dialog-actions field full"><button class="primary">Start tracking</button></div></form>`;modal.showModal();bindMeasureFields('setup');document.querySelector('#setup-form').onsubmit=async e=>{e.preventDefault();const measures=readProfileMeasures('setup');await db.put('profile',{key:'main',name:document.querySelector('#setup-name').value.trim(),birthDate:document.querySelector('#setup-birth').value,...measures,workouts:Number(document.querySelector('#setup-workouts').value),labor:Number(document.querySelector('#setup-labor').value)});modal.close();render()}}
 
-async function render(){setupNav();const renderers={overview:renderOverview,log:renderLog,workouts:renderWorkouts,pantry:renderPantry,recipes:renderRecipes,analytics:renderAnalytics,settings:renderSettings};await renderers[state.page]();app.focus({preventScroll:true})}
+async function render(){setupNav();const renderers={overview:renderOverview,log:renderLog,workouts:renderWorkouts,pantry:renderPantry,recipes:renderRecipes,analytics:renderAnalytics,settings:renderSettings};await renderers[state.page]()}
 const menuButton=document.querySelector('#menu-button');menuButton.onclick=()=>{const open=document.body.classList.toggle('menu-open');menuButton.setAttribute('aria-expanded',String(open))};document.querySelector('#menu-backdrop').onclick=closeMenu;document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
 const hash=location.hash.slice(1);if(pages.some(p=>p[0]===hash))state.page=hash;
 window.addEventListener('hashchange',()=>{const p=location.hash.slice(1);if(pages.some(x=>x[0]===p)){state.page=p;render()}});
