@@ -1,4 +1,4 @@
-# Fitness v0.88
+# Fitness v0.83
 
 A private, offline-first desktop fitness tracker built with C++20, Qt 6 Widgets,
 and SQLite. It tracks daily nutrition, hydration, weight, workouts, reusable
@@ -24,7 +24,7 @@ system installation), then run:
 ./scripts/build-appimage.sh
 ```
 
-The script produces `dist/Fitness-v0.88-x86_64.AppImage`. The same Qt source
+The script produces `dist/Fitness-v0.83-x86_64.AppImage`. The same Qt source
 can be compiled for Windows with Qt's Windows toolchain. A future web client can
 reuse the data model and field names behind a small API.
 
