@@ -50,6 +50,7 @@ private:
     QDate activeWorkoutDate{QDate::currentDate()};
     QLabel *workoutDateLabel{};
     QLineEdit *exerciseName{}, *workoutNote{};
+    QComboBox *workoutUnit{};
     QDoubleSpinBox *workoutWeight{};
     QSpinBox *workoutSets{}, *workoutReps{};
     QTableWidget *workoutTable{};

@@ -25,5 +25,5 @@ install -m644 /usr/lib/qt6/plugins/sqldrivers/libqsqlite.so "$app_dir/usr/plugin
 install -m644 /usr/lib/qt6/plugins/imageformats/libqjpeg.so "$app_dir/usr/plugins/imageformats/"
 (cd "$project_root" && \
   APPIMAGE_EXTRACT_AND_RUN=1 \
-  OUTPUT="$dist_dir/Fitness-v0.85-x86_64.AppImage" \
+  OUTPUT="$dist_dir/Fitness-v0.86-x86_64.AppImage" \
   "$linuxdeploy_bin" --appdir "$app_dir" --output appimage)

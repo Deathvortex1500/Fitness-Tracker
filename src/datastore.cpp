@@ -62,7 +62,10 @@ void DataStore::initialize() {
     };
     if (!addColumn("ALTER TABLE recipes ADD COLUMN servings INTEGER DEFAULT 1") ||
         !addColumn("ALTER TABLE recipes ADD COLUMN instructions TEXT DEFAULT ''") ||
-        !addColumn("ALTER TABLE recipe_ingredients ADD COLUMN pantry_id INTEGER"))
+        !addColumn("ALTER TABLE recipe_ingredients ADD COLUMN pantry_id INTEGER") ||
+        !addColumn("ALTER TABLE workouts ADD COLUMN weight_unit TEXT DEFAULT 'kg'") ||
+        !addColumn("ALTER TABLE pantry ADD COLUMN cost REAL DEFAULT 0") ||
+        !addColumn("ALTER TABLE recipes ADD COLUMN cost REAL DEFAULT 0"))
         error = q.lastError().text();
 }
 
@@ -135,11 +138,11 @@ void DataStore::addDaily(const QDate &date, double calories, double protein, dou
     q.addBindValue(note); q.exec();
 }
 
-void DataStore::addWorkout(const QDate &date, const QString &exercise, double weight,
-                           int sets, int reps, const QString &note) {
+void DataStore::addWorkout(const QDate &date, const QString &exercise, double weightKg,
+                           const QString &weightUnit, int sets, int reps, const QString &note) {
     QSqlQuery q(db);
-    q.prepare("INSERT INTO workouts(date,exercise,weight,sets,reps,note) VALUES(?,?,?,?,?,?)");
-    q.addBindValue(date.toString(Qt::ISODate)); q.addBindValue(exercise); q.addBindValue(weight);
+    q.prepare("INSERT INTO workouts(date,exercise,weight,weight_unit,sets,reps,note) VALUES(?,?,?,?,?,?,?)");
+    q.addBindValue(date.toString(Qt::ISODate)); q.addBindValue(exercise); q.addBindValue(weightKg); q.addBindValue(weightUnit);
     q.addBindValue(sets); q.addBindValue(reps); q.addBindValue(note); q.exec();
 }
 
@@ -152,9 +155,9 @@ QVector<QVariantMap> DataStore::workouts(const QDate &date) const {
 }
 
 int DataStore::addPantryItem(const QString &name, double calories, double protein, double carbs,
-                             double fat, double amount, const QString &unit, const QString &icon) {
-    QSqlQuery q(db);q.prepare("INSERT INTO pantry(name,calories,protein,carbs,fat,amount,unit,icon) VALUES(?,?,?,?,?,?,?,?)");
-    q.addBindValue(name);for(double value:{calories,protein,carbs,fat,amount})q.addBindValue(value);q.addBindValue(unit);q.addBindValue(icon);
+                             double fat, double cost, double amount, const QString &unit, const QString &icon) {
+    QSqlQuery q(db);q.prepare("INSERT INTO pantry(name,calories,protein,carbs,fat,cost,amount,unit,icon) VALUES(?,?,?,?,?,?,?,?,?)");
+    q.addBindValue(name);for(double value:{calories,protein,carbs,fat,cost,amount})q.addBindValue(value);q.addBindValue(unit);q.addBindValue(icon);
     return q.exec()?q.lastInsertId().toInt():-1;
 }
 
@@ -163,13 +166,13 @@ QVector<QVariantMap> DataStore::pantryItems() const {
 }
 
 int DataStore::addRecipe(const QString &name, int servings, double calories, double protein,
-                         double carbs, double fat, const QString &instructions,
+                         double carbs, double fat, double cost, const QString &instructions,
                          const QString &imagePath, const QVector<QVariantMap> &ingredients) {
     QSqlQuery q(db);
     db.transaction();
-    q.prepare("INSERT INTO recipes(name,calories,protein,carbs,fat,ingredients,image_path,servings,instructions) VALUES(?,?,?,?,?,?,?,?,?)");
+    q.prepare("INSERT INTO recipes(name,calories,protein,carbs,fat,cost,ingredients,image_path,servings,instructions) VALUES(?,?,?,?,?,?,?,?,?,?)");
     q.addBindValue(name);
-    for (double value : {calories, protein, carbs, fat}) q.addBindValue(value);
+    for (double value : {calories, protein, carbs, fat, cost}) q.addBindValue(value);
     q.addBindValue(QString()); q.addBindValue(imagePath); q.addBindValue(servings); q.addBindValue(instructions);
     if (!q.exec()) { db.rollback(); return -1; }
     const int recipeId=q.lastInsertId().toInt();

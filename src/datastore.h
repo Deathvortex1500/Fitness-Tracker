@@ -27,16 +27,16 @@ public:
     void addDaily(const QDate &date, double calories, double protein, double carbs,
                   double fat, double water, double weight, const QString &note = {});
 
-    void addWorkout(const QDate &date, const QString &exercise, double weight,
-                    int sets, int reps, const QString &note);
+    void addWorkout(const QDate &date, const QString &exercise, double weightKg,
+                    const QString &weightUnit, int sets, int reps, const QString &note);
     QVector<QVariantMap> workouts(const QDate &date) const;
 
     int addPantryItem(const QString &name, double calories, double protein, double carbs,
-                      double fat, double amount, const QString &unit, const QString &icon);
+                      double fat, double cost, double amount, const QString &unit, const QString &icon);
     QVector<QVariantMap> pantryItems() const;
 
     int addRecipe(const QString &name, int servings, double calories, double protein,
-                  double carbs, double fat, const QString &instructions,
+                  double carbs, double fat, double cost, const QString &instructions,
                   const QString &imagePath, const QVector<QVariantMap> &ingredients);
     QVector<QVariantMap> recipes() const;
     QVector<QVariantMap> recipeIngredients(int recipeId) const;
