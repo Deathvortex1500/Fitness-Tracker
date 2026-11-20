@@ -38,14 +38,15 @@ QDoubleSpinBox *number(double maximum=10000, const QString &suffix={}) {
     box->setSuffix(suffix); box->setMinimumHeight(38); return box;
 }
 QLabel *title(const QString &text, const QString &sub={}) {
-    auto *label = new QLabel(QString("<h1>%1</h1><span style='color:#91a0ad'>%2</span>").arg(text,sub));
+    static const QMap<QString,QString> colors={{"Overview","#35f2c2"},{"Log","#ff9f1c"},{"Workouts","#ff4d6d"},{"Pantry","#7cff6b"},{"Recipes","#ffe45e"},{"Analytics","#45d9ff"},{"Settings","#c77dff"}};
+    auto *label = new QLabel(QString("<h1 style='color:%1'>%2</h1><span style='color:#b8b8b8'>%3</span>").arg(colors.value(text,"#35f2c2"),text,sub));
     label->setTextFormat(Qt::RichText); label->setWordWrap(true); return label;
 }
 QWidget *statCard(const QString &name, QLabel **value, QProgressBar **bar, const QString &accent) {
     auto *card = new QFrame; card->setObjectName("card");
     auto *layout = new QVBoxLayout(card); auto *caption = new QLabel(name);
     caption->setAlignment(Qt::AlignCenter); caption->setStyleSheet(QString("color:%1;font-weight:800;letter-spacing:1px").arg(accent)); *value = new QLabel("—");
-    (*value)->setAlignment(Qt::AlignCenter); (*value)->setStyleSheet(QString("font-size:18px;font-weight:700;color:%1;background:#161b22;border-radius:10px;padding:10px").arg(accent)); *bar = new QProgressBar;
+    (*value)->setAlignment(Qt::AlignCenter); (*value)->setStyleSheet(QString("font-size:18px;font-weight:800;color:%1;background:#000;border-radius:10px;padding:10px").arg(accent)); *bar = new QProgressBar;
     (*bar)->setTextVisible(false); (*bar)->setRange(0,100);
     (*bar)->setStyleSheet("QProgressBar::chunk{background:#30363d;border-radius:4px}");
     layout->addWidget(caption); layout->addWidget(*value); layout->addWidget(*bar); return card;
@@ -72,26 +73,27 @@ QString metricLabel(const QString &metric) {
 }
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
-    setWindowTitle("Fitness · v0.83"); resize(1280, 820); setMinimumSize(320,480);
+    setWindowTitle("Fitness · v0.84"); resize(1280, 820); setMinimumSize(320,480);
     qApp->setStyleSheet(R"(
-        *{font-family:Inter,Segoe UI,Sans;font-size:14px} QMainWindow,QWidget{background:#0d1117;color:#d8dee9} QLabel{padding:4px 6px} QCheckBox,QRadioButton{padding:5px}
-        #nav{background:#090d12;border-right:1px solid #252b33} #navButton{text-align:left;padding:0 18px;background:transparent;border:0;color:#8b949e;border-radius:8px}
-        #navButton:hover{background:#151b23;color:#6daaa3} #navButton:checked{background:#192028;color:#4d9b92;font-weight:800;border-left:3px solid #3f9188}
-        #card,QGroupBox{background:#131920;border:1px solid #29313a;border-radius:12px;padding:14px} QGroupBox{margin-top:12px;font-weight:700} QGroupBox::title{subcontrol-origin:margin;left:12px;padding:0 6px;color:#4d9b92}
-        QPushButton{background:#1c242d;border:1px solid #303a45;border-radius:8px;padding:10px 16px;color:#c9d1d9} QPushButton:hover{background:#25303b;border-color:#3f9188} QPushButton#primary{background:#285d58;color:#e6fffc;font-weight:800;border:0}
-        QLineEdit,QTextEdit,QSpinBox,QDoubleSpinBox,QDateEdit,QComboBox{background:#0b1015;border:1px solid #303a45;border-radius:7px;padding:7px;color:#d8dee9} QProgressBar{background:#1c232b;border:0;border-radius:5px;height:10px}
-        QTableWidget,QListWidget{background:#10161c;border:1px solid #29313a;border-radius:8px;gridline-color:#29313a} QHeaderView::section{background:#182029;color:#5a9d96;border:0;padding:9px}
+        *{font-family:Inter,Segoe UI,Sans;font-size:14px} QMainWindow,QWidget{background:#000;color:#f7f7f7} QLabel{padding:4px 6px} QCheckBox,QRadioButton{padding:5px}
+        #nav{background:#000;border-right:1px solid #303030} #navButton{text-align:left;padding:0 18px;background:transparent;border:0;border-radius:8px}
+        #navButton:hover{background:#171717} #navButton:checked{background:#101010;font-weight:900;border-left:3px solid}
+        #card,QGroupBox{background:#070707;border:1px solid #303030;border-radius:12px;padding:14px} QGroupBox{margin-top:12px;font-weight:700} QGroupBox::title{subcontrol-origin:margin;left:12px;padding:0 6px;color:#35f2c2}
+        QPushButton{background:#0d0d0d;border:1px solid #424242;border-radius:8px;padding:10px 16px;color:#f7f7f7} QPushButton:hover{background:#171717} QPushButton#primary{background:#35f2c2;color:#000;font-weight:900;border:0}
+        QLineEdit,QTextEdit,QSpinBox,QDoubleSpinBox,QDateEdit,QComboBox{background:#000;border:1px solid #424242;border-radius:7px;padding:7px;color:#f7f7f7} QProgressBar{background:#202020;border:0;border-radius:5px;height:10px}
+        QTableWidget,QListWidget{background:#000;border:1px solid #303030;border-radius:8px;gridline-color:#303030} QHeaderView::section{background:#0c0c0c;color:#35f2c2;border:0;padding:9px}
     )");
     auto *root = new QWidget; auto *outer = new QHBoxLayout(root); outer->setContentsMargins(0,0,0,0); outer->setSpacing(0);
     navigation = new QFrame; navigation->setObjectName("nav"); navigation->setFixedWidth(210); auto *navLayout = new QVBoxLayout(navigation);
-    navigationBrand = new QLabel("FITNESS<br><span style='font-size:10px;color:#668f8a'>v0.83</span>"); navigationBrand->setTextFormat(Qt::RichText); navigationBrand->setStyleSheet("font-size:19px;font-weight:900;color:#4d9b92;padding:18px 10px;letter-spacing:1px"); navLayout->addWidget(navigationBrand);
+    navigationBrand = new QLabel("FITNESS<br><span style='font-size:10px;color:#b8b8b8'>v0.84</span>"); navigationBrand->setTextFormat(Qt::RichText); navigationBrand->setStyleSheet("font-size:19px;font-weight:900;color:#35f2c2;padding:18px 10px;letter-spacing:1px"); navLayout->addWidget(navigationBrand);
     pages = new QStackedWidget;
     navigationNames={"Overview","Log","Workouts","Pantry","Recipes","Analytics","Settings"};
     navigationIcons={"⌂","＋","◆","▦","▤","↗","⚙"};
     pages->addWidget(buildDashboard()); pages->addWidget(buildLogging()); pages->addWidget(buildWorkouts());
     pages->addWidget(buildPantry()); pages->addWidget(buildRecipes()); pages->addWidget(buildAnalytics()); pages->addWidget(buildSettings());
     auto *group = new QButtonGroup(this); group->setExclusive(true);
-    for(int i=0;i<navigationNames.size();++i) { auto *b=new QPushButton(navigationIcons[i]+"   "+navigationNames[i]); b->setCheckable(true); b->setObjectName("navButton"); b->setMinimumHeight(48); group->addButton(b,i); navLayout->addWidget(b);navigationButtons<<b;if(i==0)b->setChecked(true); }
+    const QStringList pageColors={"#35f2c2","#ff9f1c","#ff4d6d","#7cff6b","#ffe45e","#45d9ff","#c77dff"};
+    for(int i=0;i<navigationNames.size();++i) { auto *b=new QPushButton(navigationIcons[i]+"   "+navigationNames[i]); b->setCheckable(true); b->setObjectName("navButton"); b->setStyleSheet(QString("color:%1").arg(pageColors[i])); b->setMinimumHeight(48); group->addButton(b,i); navLayout->addWidget(b);navigationButtons<<b;if(i==0)b->setChecked(true); }
     navLayout->addStretch(); navigationPrivacy=new QLabel("Your data stays on this device."); navigationPrivacy->setWordWrap(true); navigationPrivacy->setStyleSheet("color:#657484;padding:12px"); navLayout->addWidget(navigationPrivacy);
     connect(group,&QButtonGroup::idClicked,this,[this](int id){pages->setCurrentIndex(id);if(id==0)refreshDashboard();if(id==1)refreshLogRecipes();if(id==2)refreshWorkouts();if(id==3)refreshPantry();if(id==4)refreshRecipes();if(id==5)refreshAnalytics();});
     auto *pageScroll=new QScrollArea;pageScroll->setWidgetResizable(true);pageScroll->setFrameShape(QFrame::NoFrame);pageScroll->setWidget(pages);outer->addWidget(navigation);outer->addWidget(pageScroll,1);
@@ -114,7 +116,7 @@ QWidget *MainWindow::buildDashboard() {
     dashboardContent=new QHBoxLayout; auto *body=new QFrame; body->setObjectName("card"); body->setMinimumWidth(260); auto *bodyLayout=new QVBoxLayout(body);
     profileHeading=new QLabel; profileHeading->setAlignment(Qt::AlignCenter); profileHeading->setStyleSheet("font-size:22px;font-weight:900;color:#587f9b"); bodyLayout->addWidget(profileHeading); auto *figure=new StickFigure; bodyLayout->addWidget(figure,1,Qt::AlignCenter);
     weightValue=new QLabel; weightValue->setAlignment(Qt::AlignCenter); weightValue->setStyleSheet("font-size:24px;font-weight:800;color:#4d9b92"); bodyLayout->addWidget(weightValue); dashboardContent->addWidget(body,2);
-    auto *grid=new QGridLayout; grid->addWidget(statCard("CALORIES",&calorieValue,&calorieBar,"#8a7958"),0,0,1,2); grid->addWidget(statCard("PROTEIN",&proteinValue,&proteinBar,"#4d8a72"),1,0); grid->addWidget(statCard("CARBS",&carbValue,&carbBar,"#587f9b"),1,1); grid->addWidget(statCard("FAT",&fatValue,&fatBar,"#765f8a"),2,0); grid->addWidget(statCard("WATER",&waterValue,&waterBar,"#4d858c"),2,1); dashboardContent->addLayout(grid,3); layout->addLayout(dashboardContent,1);
+    auto *grid=new QGridLayout; grid->addWidget(statCard("CALORIES",&calorieValue,&calorieBar,"#ffd166"),0,0,1,2); grid->addWidget(statCard("PROTEIN",&proteinValue,&proteinBar,"#52ffa8"),1,0); grid->addWidget(statCard("CARBS",&carbValue,&carbBar,"#62c6ff"),1,1); grid->addWidget(statCard("FAT",&fatValue,&fatBar,"#d99cff"),2,0); grid->addWidget(statCard("WATER",&waterValue,&waterBar,"#54efff"),2,1); dashboardContent->addLayout(grid,3); layout->addLayout(dashboardContent,1);
     return page;
 }
 
