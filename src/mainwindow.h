@@ -44,7 +44,8 @@ private:
     QProgressBar *calorieBar{}, *proteinBar{}, *carbBar{}, *fatBar{}, *waterBar{}, *totalBar{};
 
     QDoubleSpinBox *logCalories{}, *logProtein{}, *logCarbs{}, *logFat{}, *logWater{}, *logWeight{};
-    QComboBox *logRecipeChoice{};
+    QPushButton *logRecipeChoice{};
+    int selectedLogRecipeId{};
     QDoubleSpinBox *logRecipeServings{};
 
     QDate activeWorkoutDate{QDate::currentDate()};
